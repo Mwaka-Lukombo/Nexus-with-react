@@ -1,0 +1,260 @@
+
+import User from "../models/user.model.js"
+import Friend from "../models/friend.model.js";
+import Notification from '../models/notification.model.js'
+import mongoose from "mongoose";
+
+
+export const getAllStudents = async(req,res)=>{
+   const myId = req.user._id
+      let {page, limit} = req.query
+
+     try {
+
+      
+      page = Number(page);
+      limit = Number(limit);
+
+      let total = await User.find().countDocuments();
+
+       let skip = (page - 1) * limit ;
+
+         const totalPages = Math.ceil((total / limit));
+      
+        const users = await User.find({
+         typeUser:"student",
+         _id:{$ne:myId}
+        }).skip(Number(skip))
+        .limit(Number(limit))
+
+        if(!users){
+            return res.status(404).json({message:"Dont have users!"});
+        }
+
+        res.status(200).json({
+         users,
+         totalPages:totalPages,
+         currentPage:page
+        })
+     } catch (error) {
+        console.log("Error in fetching all Users", error.message);
+        res.status(500).json({message:"Internal Server Error"})
+     }
+}
+
+
+
+
+export const friendRequest = async(req,res)=>{
+   const {id:userTo} = req.params;
+    const {_id:userFrom} = req.user._id
+
+    
+   try {
+
+      if(!mongoose.isValidObjectId(userTo)){
+         return res.status(400).json({message:"Put valid id!"})
+      }
+
+      if(userFrom.toString() === userTo.toString()){
+         return res.status(400).json({message:"You dont can send friend solicitation to youself"});
+      }
+
+      const friend = await Friend.findOne({from:userFrom,to:userTo});
+
+      if(friend){
+         return res.status(400).json({message:"Request as sending!"});
+      }
+
+      //the receiver solicite to sender friend request
+      const receiverSendRequest = await Friend.findOne({from:userTo,to:userFrom});
+
+      if(receiverSendRequest){
+         return res.status({message:"This user as solicitate, check your solicitations!"});
+      }
+
+      const newRequest = new Friend({
+         from:userFrom,
+         to:userTo
+      })
+
+      await newRequest.save();
+      
+      await Notification.insertOne({to:userTo, from:userFrom,typeNotification:"friend request"});
+
+      res.status(201).json(newRequest);
+      
+   } catch (error) {
+      console.log("Error in friendController ",error.message);
+      res.status(500).json({message:"Internal Server Error"});
+   }
+}
+
+
+
+export const getFriendsRequests = async(req,res)=>{
+   const {_id} = req.user
+
+   try {
+      const user = await User.findById(_id);
+
+      if(!user){
+         return res.status(404).json({message:"User not found!"});
+      }
+
+      //getRequests
+      const request = await Friend.find({to:_id,status:{$ne:"accepted"}}).populate({
+         path:"from",
+         select:"-password"
+      });
+
+      res.status(200).json(request);
+   } catch (error) {
+      console.log("Error in acceptFriendController ", error.message);
+      res.status(500).json({message:"Internal Server Error!"});
+   }
+}
+
+
+export const acceptFriends = async(req,res)=>{
+     const {_id} = req.user 
+      const {id:userId} = req.params
+     try {
+
+         const user = await User.findById(_id);
+         const userFromData = await User.findById(userId);
+
+         if(!user){
+            return res.status(404).json({message:"User not found!"});
+         }
+
+         //getSolications
+         const solicitation = await Friend.findOne({from:userId,to:_id});
+
+         if(solicitation.status === "accepted"){
+            return res.status(400).json({message:"Your are friends!"})
+         }
+
+         await Friend.findByIdAndUpdate(solicitation._id,{status:"accepted"},{new:true});
+
+          if(user.studentParameters.friends.includes(userId) || userFromData.studentParameters.friends.includes(user._id)){
+            return res.status(400).json({message:"you are friends"})
+          }
+
+          
+          
+          user.studentParameters.friends.push(userId);
+          userFromData.studentParameters.friends.push(user._id);
+          
+          await user.save();
+          await userFromData.save();
+
+         res.status(200).json(user.studentParameters.friends);
+        
+     } catch (error) {
+       console.log("Error in acceptFriend Controller ",error.message);
+     }
+}
+
+
+export const rejectedFriend = async(req,res)=>{
+   const {id:solicitationId} = req.params 
+
+     try{
+
+      const solicitation = await Friend.find({_id:solicitationId});
+
+       //optimise the code
+      if(solicitation.status == "accepted") return;
+
+      await Friend.findByIdAndDelete(solicitationId);
+      
+      res.status(200).json({message:"Friend request as rejected"});
+     }catch(error){
+       console.log("Error in rejectedController ",error.message);
+       res.status(500).json({message:"Internal Server Error"});
+     }
+}
+
+
+
+export const myFriends = async (req, res) => {
+  const { _id } = req.user;
+
+  try {
+    const user = await User.findById(_id).populate({
+      path: "studentParameters.friends",
+      select: "fullname email profileImg"
+    });
+
+    if (!user || user.studentParameters.friends.length === 0) {
+      return res.status(404).json({ message: "You dont have friends!" });
+    }
+
+    
+    res.status(200).json(user.studentParameters.friends);
+
+  } catch (error) {
+    console.log("Error in myFriendsController ", error.message);
+    res.status(500).json({ message: "Internal Server Error!" });
+  }
+};
+
+
+export const removeFriend = async(req,res)=>{
+   const {id} = req.params;
+      const {_id:myId} = req.user;
+   try{
+
+      if(!mongoose.isValidObjectId(id)){
+         return res.status(400).json({message:"Put valid objectId"});
+      }
+
+      const currentUser = await User.findById(myId);
+       const outherUser = await User.findById(id);
+
+       if(!currentUser || !outherUser){
+         return res.status(404).json({message:'Users not found!'});
+       }
+
+       const previousRequest = await Friend.findOne({
+            $or:[
+               {from:currentUser,to:outherUser},
+               {from:outherUser,to:currentUser}
+            ]
+         })
+
+         if(!previousRequest){
+            return res.status(400).json({message:"Something wet wrong!"});
+         }
+
+       if(currentUser.studentParameters.friends.includes(outherUser._id) || 
+         outherUser.studentParameters.friends.includes(currentUser._id)
+        ){
+         
+         currentUser.studentParameters.friends.pull(outherUser._id);
+         outherUser.studentParameters.friends.pull(currentUser._id);
+
+         
+         
+         //delete messages from this users in database
+         await Friend.findByIdAndDelete(previousRequest._id);
+         currentUser.save();
+         outherUser.save();
+
+         res.status(200).json({message:"User removed successfully!"})
+       }
+
+   }catch(error){
+        console.log("Error inRemoveFriendController ",error.message);
+        res.status(500).json({message:"Internal Server Error!"});
+   }
+}
+
+
+
+
+
+
+
+
