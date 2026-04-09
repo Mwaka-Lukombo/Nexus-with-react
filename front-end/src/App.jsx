@@ -13,6 +13,7 @@ import {Campus} from './pages/Campus/Campus';
 import { campusStore } from './store/campuStore';
 import { messageStore } from './store/messageStore';
 import { Header } from './components/common/Header';
+import { CreateAlumin } from './pages/Alumin/CreateAlumin';
 
 function App() {
   const {
@@ -110,6 +111,7 @@ useEffect(()=>{
             <Route path='/campus' element={userAuth ? <Campus user={userAuth} /> : <Navigate to={'/login'} />} />
             <Route path='/message' element={userAuth ? <Message userAuth={userAuth} createMessage={createMessage} setSelectedUser={setSelectedUser} onlineUsers={onlineUsers} Friends={Friends} selectedUser={selectedUser} /> : <Navigate to={'/login'} />} />
             <Route path='/alumin' element={userAuth ? <Alumin /> : <Navigate to={'/login'} />} />
+            <Route path='/createAlumin' element={userAuth ? <CreateAlumin /> : <Navigate to={'/login'} />} />
           </Routes>
          </div>
         <Toaster />

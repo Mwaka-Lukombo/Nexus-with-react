@@ -2,7 +2,7 @@
 import { Notice } from "../models/notice.model.js";
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
-import mongoose from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 
 
 async function uploadFile(file){
@@ -285,6 +285,8 @@ export const createNotices = async(req,res)=>{
         video = await fileUpload.secure_url;
     }
 
+    const user = await User.find({_id:{$ne:userId}});
+
     const newNotice = new Notice({
         userId,
         title,
@@ -294,6 +296,9 @@ export const createNotices = async(req,res)=>{
     })
 
     await newNotice.save();
+    
+    //Send Notification for all Students
+    
 
     res.status(200).json(newNotice);
     
@@ -334,7 +339,7 @@ export const myNotices = async(req,res)=>{
 
 
     const myNotices = await Notice.find({userId:_id})
-    .skip(Number(skip))
+    .skip(Number(skip || 1))
     .limit(Number(limit));
 
 
@@ -390,3 +395,35 @@ export const deleteNotice = async(req,res) =>{
         res.status(500).json({message:"Internal Server Error"})
     }
 }
+
+
+
+export const updateNotice = async(req,res)=>{
+  const {id} = req.params;
+   const {title, text} = req.body
+
+   try {
+     if(!mongoose(isValidObjectId(id))){
+      return res.status(400).json({message:"Internal Server Error"});
+     }
+
+     const notice = await Notice.findById(id);
+
+     if(!notice){
+      return res.status(404).json({message:"Notice not found!"});
+     }
+     
+     notice.title = title;
+     notice.text = text;
+     
+     await notice.save();
+
+     res.status(200).json(notice);
+
+   } catch (error) {
+     console.log(error.response?.data?.message);
+     res.status(500).json({message:'Internal Server Error'})
+   }
+}
+
+

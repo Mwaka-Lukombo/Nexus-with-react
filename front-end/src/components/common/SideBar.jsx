@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { authStore } from "../../store/authStotre";
-import { Home, LogOut, MessageCircle, NetworkIcon, SchoolIcon, SquareChevronLeft, SquareChevronRight } from "lucide-react";
+import { Hand, Home, LogOut, MessageCircle, NetworkIcon, SchoolIcon, SquareChevronLeft, SquareChevronRight } from "lucide-react";
 
 export const SideBar = ({
     userAuth,
@@ -59,6 +59,13 @@ export const SideBar = ({
         <NetworkIcon className="size-4" />
         {sidebarWidth === 300 && <span className="text-sm">Alumin</span>}
         </NavLink>
+
+        {userAuth?.typeUser === 'old student' && (
+          <NavLink to="/createAlumin" className={navClass}>
+          <Hand className="size-4" />
+          {sidebarWidth === 300 && <span className="text-sm">Create</span>}
+          </NavLink>
+        )}
       </div>
 
       

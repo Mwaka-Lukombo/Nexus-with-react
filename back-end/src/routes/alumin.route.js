@@ -14,7 +14,8 @@ import {
     myStoredNoticesProfile, 
     noticeStore, 
     oldStudents, 
-    opportunites 
+    opportunites, 
+    updateNotice
 
 } from "../controllers/alumin.controller.js";
 
@@ -40,6 +41,7 @@ router.use(isOldStudent);
 
 router.get('/myNotices',myNotices);
 router.post('/create',createNotices);
+router.patch('/updateNotice/:id',updateNotice);
 router.delete('/:id',deleteNotice);
 
 

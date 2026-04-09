@@ -114,6 +114,22 @@ getNotifications:async()=>{
     console.log(error.message);
  }
 },
+readNotification:async()=>{
+  try {
+     const res = await axiosInstance.patch('/notification/readNotification');
+  } catch (error) {
+     console.log(error.message);
+  }
+},
+deleteNotifications:async()=>{
+  try {
+    const res = await axiosInstance.delete('/notification/deleteNotifications');  
+
+    await get().getNotifications();
+  } catch (error) {
+      console.log(error.message);
+  }
+},
 setSelectedUser:async(data)=>{
     set({selectedUser:data});
     messageStore.setState({messages:[]});

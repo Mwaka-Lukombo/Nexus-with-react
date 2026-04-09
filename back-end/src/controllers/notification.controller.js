@@ -22,7 +22,7 @@ export const getNotify = async(req,res)=>{
     const myNotifications = await Notification.find({to:user._id},{read:false}).populate({
         path:"from",
         select:"fullname email profileImg typeUser"
-    });
+    }).sort({createdAt:-1});
 
     res.status(200).json(myNotifications);
  } catch (error) {
@@ -65,3 +65,30 @@ export const readNotify = async(req,res)=>{
     }
 
 }
+
+
+export const deleteNotifications = async(req,res)=>{
+    const {_id:userId} = req.user;
+
+    try {
+        if(!mongoose.isValidObjectId(userId)){
+            return res.status(400).json({message:"Put valid ObjectId"});
+        }
+
+        const user = await User.findById(userId);
+
+        if(!user) return res.status(404).json({message:'User not found!'});
+
+         await Notification.deleteMany(
+            {to:userId}
+         )
+
+
+         res.status(200).json({message:"Notifications deleted successfully!"});
+        
+    } catch (error) {
+        console.log("Error inDeleteNotificationController ",error.message);
+        res.status(500).json({message:"Internal Server Error"});
+    }
+}
+

@@ -11,7 +11,7 @@ export const MyPlayer = ({ src }) => {
   return (
     <Player.Provider>
       <VideoSkin>
-        <Video src={src} playsInline />
+        <Video src={src} playsInline className='w-full h-full bg-cover bg-center' />
       </VideoSkin>
     </Player.Provider>
   );

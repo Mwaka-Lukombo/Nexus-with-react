@@ -6,7 +6,9 @@ import {
   VoidElements
 } from '../../components/common/VoidElements'
 import { campusStore } from '../../store/campuStore';
+import {authStore} from '../../store/authStotre';
 import { CampusSkeleton } from '../../components/skeletons/CampusSkeleton';
+import { TotalElments } from '../../components/common/TotalElments';
 
 export const Campus = () => {
 
@@ -26,6 +28,10 @@ const [campusPage,setCampusPage] = useState("allStudents");
     rejectFriend,
     removeFriend
   } = campusStore();
+
+  const {
+    userAuth
+  } = authStore();
 
 
   useEffect(()=>{
@@ -50,7 +56,32 @@ const [campusPage,setCampusPage] = useState("allStudents");
   
 
 
-  const studentParameters = students.users?.studentParameters;
+
+  const FriendsId = [];
+  const AllStudents = [];
+
+  for(let i = 0; i < Friends.length; i++){
+     const id = Friends[i]?._id;
+     if(!FriendsId.includes(id)){
+      FriendsId.push(id)
+     }
+  }
+
+
+  for(let i = 0; i < students?.users?.length;i++){
+     const student = students?.users[i];
+     AllStudents.push(student)
+  }
+
+const friendsIds = Friends.map(friend => friend._id);
+
+const filteredUsers = students?.users?.filter(
+  student => !friendsIds.includes(student._id)
+);
+  
+
+
+
 
 
   return (
@@ -58,7 +89,7 @@ const [campusPage,setCampusPage] = useState("allStudents");
     <>
     <div className='p-3'>
 
-          <div className='grid md:grid-cols-3 gap-3'>
+          <div className='grid  grid-cols-1 md:grid-cols-3 gap-3'>
 
              <div onClick={()=> setCampusPage("allStudents")} className='transition-all flex items-center justify-center col-span-1 h-[30px] relative cursor-pointer'>
               <span>All Students</span>
@@ -78,14 +109,21 @@ const [campusPage,setCampusPage] = useState("allStudents");
           
           <>
           <h3 className='text-2xl mb-4 text-secundary-color font-bold'>Campus</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
         
           {campusPage === "allStudents" && (
             <>
-            {students.users?.map((user) => (
-          <div
+            
+            {/* users */}
+
+            {filteredUsers?.length === 0  && (
+              <VoidElements text={'All are you friends'} emoji={"🙂‍↕️"} />
+            )}
+            
+          {Array.isArray(filteredUsers) && filteredUsers.map((user)=> (
+              <div
             key={user._id}
-            className=" border border-[rgb(114,16,17)] rounded-2xl shadow-md p-5 flex flex-col items-center text-center hover:shadow-lg transition"
+            className="col-span-1 w-full bg-white border border-[rgb(114,16,17)] rounded-2xl shadow-md p-5 flex flex-col items-center text-center hover:shadow-lg transition"
           >
             {/* profile */}
             
@@ -106,43 +144,41 @@ const [campusPage,setCampusPage] = useState("allStudents");
             <p className="text-sm text-gray-600 mb-4">
               {user.course}
             </p>
-
            <div className="flex flex-col gap-2 w-full items-center">
+              {user.friends?.includes(user._id) ? (
+                <Link
+                  
+                  className="flex items-center justify-center gap-2 w-[70%] btn bg-success text-white cursor-not-allowed hover:bg-success"
+                >
+                  <Check />
+                  <span>Friend</span>
+                </Link>
+                // not pressistent in dataBase
+              ) : myFriendsSolicitations.includes(user._id) ? (
 
-  
-  {studentParameters?.friends?.includes(user._id) ? (
-    <Link
-      
-      className="flex items-center justify-center gap-2 w-[70%] btn bg-success text-white cursor-not-allowed hover:bg-success"
-    >
-      <Check />
-      <span>Friend</span>
-    </Link>
-    // not pressistent in dataBase
-  ) : myFriendsSolicitations.includes(user._id) ? (
+                <button
+                  disabled
+                  className="bg-gray-300 text-white cursor-not-allowed bg-error px-4 py-2 rounded-xl w-[70%]"
+                >
+                  Pedido enviado
+                </button>
 
-    <button
-      disabled
-      className="bg-gray-300 text-white cursor-not-allowed bg-error px-4 py-2 rounded-xl w-[70%]"
-    >
-      Pedido enviado
-    </button>
+              ) : (
 
-  ) : (
+                
+                <button
+                  onClick={() => addFriend(user._id)}
+                  className="bg-[rgb(114,16,17)] text-white px-4 py-2 rounded-xl hover:bg-[rgb(140,25,26)] transition w-[70%]"
+                >
+                  Adicionar amigo
+                </button>
 
-    
-    <button
-      onClick={() => addFriend(user?._id)}
-      className="bg-[rgb(114,16,17)] text-white px-4 py-2 rounded-xl hover:bg-[rgb(140,25,26)] transition w-[70%]"
-    >
-      Adicionar amigo
-    </button>
-
-  )}
-</div>
+              )}
+            </div>
           </div>
-        ))}
-            </>
+
+            ))}
+            </>  
           )}
 
                   {/* Solicitations */}
@@ -177,10 +213,12 @@ const [campusPage,setCampusPage] = useState("allStudents");
 
          {/*MyFriends  */}
         {campusPage === "myFriends" && (
+          
           <>
+          
           {Friends.length === 0 && <VoidElements text="Your dont have Friends" emoji={"🧐"} />}
             {Array.isArray(Friends) && Friends.map((Friend)=> (
-              <div className='py-3 col-span-1 min-h-[200px] rounded-xl border-2 border-secundary-color'>
+              <div className=' py-3 col-span-1 w-full min-h-[200px] rounded-xl border-2 border-secundary-color'>
               <div className='flex items-center justify-center w-[75px] h-[75px] mx-auto rounded-full border-2 border-[#111]'>
                 <img src={Friend.profileImg || "/avatar.png"} 
                 
