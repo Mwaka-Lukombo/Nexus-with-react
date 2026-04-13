@@ -8,12 +8,17 @@ import { messageStore } from './messageStore';
 
 export const campusStore = create((set,get) => ({
     students:[],
+    oldStudents:[],
+    singleStudent:{},
     friendSolicitations:[],
     myFriendsSolicitations:[],
     selectedUser:null,
     Friends:[],
     notifications:[],
     theme:localStorage.getItem("data-theme") || "light",
+    isSingle:false,
+    isOlding:false,
+    isUpdateProfileOld:false,
     isLoading:false,
     isMyFriend:false,
     getAllStudents:async(page)=>{
@@ -117,6 +122,7 @@ getNotifications:async()=>{
 readNotification:async()=>{
   try {
      const res = await axiosInstance.patch('/notification/readNotification');
+     
   } catch (error) {
      console.log(error.message);
   }
@@ -130,6 +136,15 @@ deleteNotifications:async()=>{
       console.log(error.message);
   }
 },
+deleteNotification:async(id)=>{
+  try {
+    const res = await axiosInstance.delete(`notification/deleteNotification/${id}`);
+
+    await get().getNotifications();
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+  }
+},
 setSelectedUser:async(data)=>{
     set({selectedUser:data});
     messageStore.setState({messages:[]});
@@ -137,6 +152,46 @@ setSelectedUser:async(data)=>{
 setTheme:async(theme)=>{
    set({theme:theme})
    localStorage.setItem("data-theme",theme)
+},
+//Old students
+getOldStudens:async(req,res)=>{
+    set({isOlding:true});
+    try{
+     const res = await axiosInstance.get('/campus/oldStudents');
+     set({oldStudents:res.data});
+
+    }catch(error){
+      console.log(error.message);
+    }finally{
+        set({isOlding:false})
+    }
+},
+updateOldProfile:async(data)=>{
+    set({isUpdateProfileOld:true});
+
+    try {
+        const res = await axiosInstance.patch(`/campus/updateOld`,data);
+
+        toast.success("Profile updated successfully");
+
+        await get().oldStudents();
+
+    } catch (error) {
+        toast.error(error.resposne?.data?.message);
+    }finally{
+        set({isUpdateProfileOld:false});
+    }
+},
+getSingleUser:async(id)=>{
+    set({isSingle:true});
+    try {
+        const res = await axiosInstance.get(`/campus/singleOld/${id}`);
+        set({singleStudent:res.data});
+    } catch (error) {
+        console.log(error.message);
+    }finally{
+        set({isSingle:false});
+    }
 }
 }))
 

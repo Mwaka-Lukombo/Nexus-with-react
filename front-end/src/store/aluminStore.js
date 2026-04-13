@@ -100,7 +100,7 @@ createNotice:async(data)=>{
 },
 getMyNotices:async(page)=>{
     try {
-        const res = await axiosInstance.get(`/alumin/myNotices?page=${page}&&limit=5`);
+        const res = await axiosInstance.get(`/alumin/myNotices?page=${page}&&limit=2`);
         set({myNotices:res.data});
     } catch (error) {
         console.log(error.message);

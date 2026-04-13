@@ -20,9 +20,18 @@ import {
 import {
   timeAgo
 } from '../../utils/formateTime';
-import { authStore } from '../../store/authStotre';
-import { AluminSkeleton } from '../../components/skeletons/AluminSkeleton';
+
+
+import { 
+  authStore 
+} from '../../store/authStotre';
+
+import { 
+  AluminSkeleton 
+} from '../../components/skeletons/AluminSkeleton';
 import { MyPlayer } from '../../components/lib/MyPlayer';
+import { campusStore } from '../../store/campuStore';
+import {Link} from 'react-router-dom'
 
 export const Alumin = () => {
   const [aluminPage,setAluminPage] = useState("forYour");
@@ -42,6 +51,12 @@ export const Alumin = () => {
           getMyStoreds
         } = aluminStore();
 
+        const {
+          getOldStudens,
+          oldStudents,
+          isOlding
+        } = campusStore();
+
 
         const {
           userAuth
@@ -53,7 +68,12 @@ export const Alumin = () => {
 
   useEffect(()=>{
     getMyStoreds();
-  },[getMyStoreds,stored])
+  },[getMyStoreds,stored]);
+
+
+  useEffect(()=>{
+    getOldStudens();
+  },[getOldStudens]);
 
   const handleComment = (e)=>{
      e.preventDefault();
@@ -62,6 +82,7 @@ export const Alumin = () => {
      
      setComment("");
   }
+
 
 
 
@@ -255,24 +276,24 @@ export const Alumin = () => {
           {aluminPage === "connect" && (
             <div className='w-full px-[50px]'>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {users.map((user) => (
+        {Array.isArray(oldStudents) && oldStudents?.map((user) => (
           <Link
-            to={`/profile/${user.id}`}
+            to={`profile/${user._id}`}
             key={user.id}
-            className="block"
+            className="block my-5"
           >
             <div className="bg-white border border-[rgb(114,16,17)] rounded-2xl shadow-md p-5 flex flex-col items-center text-center hover:shadow-xl transition relative">
               
               {/* Avatar */}
               <img
-                src={user.avatar}
-                alt={user.name}
+                src={user?.profileImg || '/avatar.png'}
+                alt={user?.fullname}
                 className="w-20 h-20 rounded-full object-cover border-2 border-[rgb(114,16,17)] mb-3"
               />
 
               {/* Nome */}
               <h2 className="text-lg font-semibold text-[rgb(114,16,17)]">
-                {user.name}
+                {user?.fullname}
               </h2>
 
               {/* Curso */}

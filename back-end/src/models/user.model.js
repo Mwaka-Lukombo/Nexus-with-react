@@ -41,6 +41,12 @@ const userSchema = new mongoose.Schema({
           ref:"User"
         }
       ],
+      follow:[
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref:"User"
+        }
+      ],
      biography:{
       type:String
      },
@@ -48,7 +54,10 @@ const userSchema = new mongoose.Schema({
       experience:{type:String,default:""},
       empresas:[],
       about:{type:String,default:""},
-      causes:{type:String,default:""}   
+      causes:{type:String,default:""},
+      social1:{type:String,default:""},
+      social2:{type:String,default:""},
+      social3:{type:String,default:""},   
     }
   
 },{

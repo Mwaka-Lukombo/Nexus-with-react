@@ -1,89 +1,232 @@
-import { Link, NavLink } from "react-router-dom";
-import { authStore } from "../../store/authStotre";
-import { Hand, Home, LogOut, MessageCircle, NetworkIcon, SchoolIcon, SquareChevronLeft, SquareChevronRight } from "lucide-react";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import {
+  Hand,
+  Home,
+  LogOut,
+  MessageCircle,
+  NetworkIcon,
+  SchoolIcon,
+  SquareChevronLeft,
+  SquareChevronRight,
+  UserCheck,
+  UserCogIcon,
+  BookOpen,
+  ChevronDown,
+  ChevronUp,
+  Newspaper,
+  Presentation,
+  GraduationCap,
+} from "lucide-react";
 
 export const SideBar = ({
-    userAuth,
-    logout,
-    sidebarWidth,
-    setSidebarWidth
+  userAuth,
+  logout,
+  sidebarWidth,
+  setSidebarWidth,
 }) => {
+  const isCollapsed = sidebarWidth <= 80;
 
+  const [openAlumni, setOpenAlumni] = useState(false);
+  const [openTeacher, setOpenTeacher] = useState(false);
+  const [openForum, setOpenForum] = useState(false);
 
   const handleSideBar = () => {
-  setSidebarWidth(prev => (prev === 300 ? 80 : 300));
-};
-
-  
-  const handleLogout = ()=>{
-    logout();
-    setSidebarWidth(prev => (prev && 80))
-  }
-
-  const navClass = ({ isActive }) =>
-  `w-full h-[45px] flex ${sidebarWidth === 80 && "justify-center"} items-center gap-3 px-2 rounded-xl mb-3 transition
-   ${isActive ? "bg-secundary-color text-white" : "hover:bg-secundary-color hover:text-white"}`;
-
-  return (
-    <div
-    className="fixed top-0 left-0 shadow-xl h-screen  transition-all duration-300 "
-    style={{ width: `${sidebarWidth}px` }}
-    > 
-      <div className="p-7 flex items-center gap-2 relative px-3">
-        <img src="/assent/Logo.png" alt="logo" className="w-[50px] h-[50px]" />
-        {sidebarWidth === 300 && <h3 className="text-xl font-bold">Nexus</h3>}
-
-        <div className="absolute top-2 right-0 cursor-pointer" onClick={handleSideBar}>
-            {sidebarWidth === 80 ? <SquareChevronRight className="size-7"/> : <SquareChevronLeft className="size-7"/>}
-        </div>
-      </div>
+    setSidebarWidth((prev) => {
+      const newWidth = prev <= 80 ? 280 : 80;
 
       
-      <div className="px-3">
+      if (newWidth === 80) {
+        setOpenAlumni(false);
+        setOpenTeacher(false);
+        setOpenForum(false);
+      }
+
+      return newWidth;
+    });
+  };
+
+  const handleLogout = () => {
+    logout();
+    setSidebarWidth(80);
+  };
+
+  const navClass = ({ isActive }) =>
+    `flex items-center ${
+      isCollapsed ? "justify-center" : "gap-3"
+    } px-3 py-2 text-sm rounded-xl transition-all
+     ${
+       isActive
+         ? "bg-secundary-color text-white"
+         : "text-gray-600 hover:bg-secundary-color hover:text-white"
+     }`;
+
+  return (
+    <aside
+      className="fixed top-0 left-0 h-screen shadow-xl flex flex-col border-r border-[#ccc] bg-white"
+      style={{ width: sidebarWidth }}
+    >
+      {/* HEADER */}
+      <div className="flex items-center justify-between px-3 py-4">
+        <div className="flex items-center gap-2">
+          <img src="/assent/Logo.png" className="w-10 h-10" />
+          {!isCollapsed && <h3 className="font-bold text-lg">Nexus</h3>}
+        </div>
+
+        <button onClick={handleSideBar}>
+          {isCollapsed ? <SquareChevronRight /> : <SquareChevronLeft />}
+        </button>
+      </div>
+
+      {/* NAV */}
+      <div className="my-5 flex-1 overflow-y-auto px-2 space-y-2">
         <NavLink to="/" className={navClass}>
-        <Home className="size-4" />
-        {sidebarWidth === 300 && <span className="text-sm">Home</span>}
+          <Home size={18} />
+          {!isCollapsed && <span>Home</span>}
         </NavLink>
 
         <NavLink to="/campus" className={navClass}>
-        <SchoolIcon className="size-4" />
-        {sidebarWidth === 300 && <span className="text-sm">Campus</span>}
+          <SchoolIcon size={18} />
+          {!isCollapsed && <span>Campus</span>}
         </NavLink>
 
         <NavLink to="/message" className={navClass}>
-        <MessageCircle className="size-4" />
-        {sidebarWidth === 300 && <span className="text-sm">Message</span>}
+          <MessageCircle size={18} />
+          {!isCollapsed && <span>Messages</span>}
         </NavLink>
 
-        <NavLink to="/alumin" className={navClass}>
-        <NetworkIcon className="size-4" />
-        {sidebarWidth === 300 && <span className="text-sm">Alumin</span>}
-        </NavLink>
+        {/* ================= ALUMNI ================= */}
+        {!isCollapsed && (
+          <button
+            onClick={() => setOpenAlumni(!openAlumni)}
+            className="w-full flex items-center justify-between px-3 py-2 text-xs text-gray-400"
+          >
+            ALUMNI {openAlumni ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        )}
 
-        {userAuth?.typeUser === 'old student' && (
-          <NavLink to="/createAlumin" className={navClass}>
-          <Hand className="size-4" />
-          {sidebarWidth === 300 && <span className="text-sm">Create</span>}
-          </NavLink>
+        
+        {openAlumni &&  (
+          <div className="ml-3 space-y-1">
+            <NavLink to="/alumin" className={navClass}>
+              <Newspaper size={16} />
+              {!isCollapsed && <span>Home</span>}
+            </NavLink>
+            
+            {userAuth.typeUser === "old student" && (
+              <>
+               <NavLink to="/createAlumin" className={navClass}>
+              <Hand size={16} />
+              {!isCollapsed && <span>Create</span>}
+            </NavLink>
+
+            <NavLink to="/oldAlumin" className={navClass}>
+              <UserCheck size={16} />
+              {!isCollapsed && <span>Profile</span>}
+            </NavLink>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ================= DOCENTE ================= */}
+        {userAuth?.typeUser === "teacher" && (
+          <>
+            {!isCollapsed && (
+              <button
+                onClick={() => setOpenTeacher(!openTeacher)}
+                className="w-full flex items-center justify-between px-3 py-2 text-xs text-gray-400"
+              >
+                TURMAS{" "}
+                {openTeacher ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+            )}
+
+            {openTeacher && (
+              <div className="ml-3 space-y-1">
+
+                <NavLink to="/classes" className={navClass}>
+                  <GraduationCap size={16} />
+                  {!isCollapsed && <span>Class</span>}
+                </NavLink>
+                
+                {userAuth?.typeUser === 'teacher' && (
+                  <>
+                   <NavLink to="/createClass" className={navClass}>
+                  <BookOpen size={16} />
+                  {!isCollapsed && <span>Create Class</span>}
+                </NavLink>
+
+                <NavLink to="/myClasses" className={navClass}>
+                  <SchoolIcon size={16} />
+                  {!isCollapsed && <span>My Classes</span>}
+                </NavLink>
+                  </>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ================= FORUM ================= */}
+        {!isCollapsed && (
+          <button
+            onClick={() => setOpenForum(!openForum)}
+            className="w-full flex items-center justify-between px-3 py-2 text-xs text-gray-400"
+          >
+            FORUM {openForum ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+        )}
+
+        {openForum && (
+          <div className="ml-3 space-y-1">
+            <NavLink to="/forum" className={navClass}>
+              <MessageCircle size={16} />
+              {!isCollapsed && <span>All Topics</span>}
+            </NavLink>
+
+            {userAuth?.typeUser !== "student" && (
+              <NavLink to="/forum/create" className={navClass}>
+              <Hand size={16} />
+              {!isCollapsed && <span>Create Topic</span>}
+            </NavLink>
+            )}
+          </div>
+        )}
+
+        {/* ================= ADMIN ================= */}
+        {userAuth?.email === "alphonse@gmail.com" && (
+          <>
+            {!isCollapsed && (
+              <p className="text-xs text-gray-400 mt-4 px-2">ADMIN</p>
+            )}
+            <NavLink to="/createUser" className={navClass}>
+              <UserCogIcon size={18} />
+              {!isCollapsed && <span>Users</span>}
+            </NavLink>
+          </>
         )}
       </div>
 
-      
-      
-      <div className={`flex items-center ${sidebarWidth === 80 && "flex-col"} gap-3 w-full h-[100px] px-3 absolute bottom-16 `}>
-        
-        <div className={` ${userAuth?.fullname.split(" ").length > 2 && sidebarWidth == 300 && "w-[30px] h-[30px]"} ${sidebarWidth === 80 ? "w-[50px] h-[50px]" : "w-[70px] h-[70px]"} rounded-full border`}>
-          <img src={userAuth?.profileImg || '/avatar.png'} 
-          className="w-full h-full bg-cover bg-no-repeat bg-center rounded-full"
-          />
-        </div>
-        
-        {sidebarWidth === 300 && <span>{userAuth?.fullname}</span>}
-        <button onClick={handleLogout} className="btn btn-md">
-            <LogOut />
+      {/* FOOTER */}
+      <div className="border-t p-3 flex items-center gap-3">
+        <img
+          src={userAuth?.profileImg || "/avatar.png"}
+          className={`rounded-full ${
+            isCollapsed ? "w-10 h-10 mx-auto" : "w-12 h-12"
+          }`}
+        />
+
+        {!isCollapsed && (
+          <div className="flex-1">
+            <p className="text-sm font-medium">{userAuth?.fullname}</p>
+          </div>
+        )}
+
+        <button onClick={handleLogout}>
+          <LogOut />
         </button>
       </div>
-      
-    </div>
+    </aside>
   );
 };

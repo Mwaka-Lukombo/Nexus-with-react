@@ -44,7 +44,13 @@ export const createMessage = async(req,res)=>{
          })
 
          await newMessage.save();
-         await Notification.insertOne({from:userFrom,to:userTo,typeNotification:"message"});
+         await Notification.insertOne({
+            from:userFrom,
+            to:userTo,
+            title:"Message",
+            text,
+            typeNotification:"message"}
+        );
 
          //realTimeApp
          if(!req.user && !userTo) return;

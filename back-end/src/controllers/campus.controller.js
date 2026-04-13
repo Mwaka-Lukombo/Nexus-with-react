@@ -3,6 +3,7 @@ import User from "../models/user.model.js"
 import Friend from "../models/friend.model.js";
 import Notification from '../models/notification.model.js'
 import mongoose from "mongoose";
+import cloudinary from '../lib/cloudinary.js';
 
 
 export const getAllStudents = async(req,res)=>{
@@ -61,6 +62,7 @@ export const friendRequest = async(req,res)=>{
       }
 
       const friend = await Friend.findOne({from:userFrom,to:userTo});
+      const user = await User.findById(userFrom);
 
       if(friend){
          return res.status(400).json({message:"Request as sending!"});
@@ -80,7 +82,14 @@ export const friendRequest = async(req,res)=>{
 
       await newRequest.save();
       
-      await Notification.insertOne({to:userTo, from:userFrom,typeNotification:"friend request"});
+      await Notification.insertOne({
+         to:userTo, 
+         from:userFrom,
+         title:"Friend Request",
+         text:`${user?.fullname} wont to be your friend`,
+         typeNotification:"friend request"
+
+      });
 
       res.status(201).json(newRequest);
       
@@ -251,6 +260,167 @@ export const removeFriend = async(req,res)=>{
    }
 }
 
+
+
+
+// old students
+export const getOldStudents = async(req,res)=>{
+
+   try {
+      const students = await User.find(
+         {typeUser:"old student",_id:{$ne:req.user._id}}
+      );
+      
+      if(!students) return res.status(404).json({message:"Old students not found!"});
+
+      res.status(200).json(students)
+   } catch (error) {
+      console.log("ErrorInGetOldStudentController ",error.message);
+      res.status(500).json({message:"Internal Server Error"})
+   }
+}
+
+
+
+export const oldProfile = async(req,res)=>{
+   const {
+      bannerProfile, 
+      experience, 
+      empresas,
+      about,
+      causes,
+      social1,
+      social2,
+      social3,
+      primario,
+      secundario,
+      superior
+   } 
+   = req.body;
+   
+    const {_id:userId} = req.user
+    let banner = "";
+    
+
+   try {
+      if(!causes || !about){
+        return res.status(400).json({message:"write anything!"});
+     }
+
+     const user = await User.findById(userId);
+
+     if(!user) return res.status(404).json({message:"User not found!"});
+
+     const toEdit = user.oldParameters;
+
+     if(bannerProfile){
+       const file = await cloudinary.uploader.upload(bannerProfile);
+       banner = await file.secure_url;
+     }
+
+     toEdit.bannerProfile = banner;
+     toEdit.experience = experience;
+     toEdit.empresas.push(empresas);
+     toEdit.about = about;
+     toEdit.causes = causes;
+     toEdit.social1 = social1;
+     toEdit.social2 = social2;
+     toEdit.social3 = social3;
+     toEdit.secundario = secundario;
+     toEdit.primario = primario;
+     toEdit.superior = superior;
+
+      await user.save();
+
+      res.status(200).json(user);
+
+   } catch (error) {
+      console.log("ErrorInUpdateOldStudentController ",error.message);
+      res.status(500).json({message:"Internal Server Error"})
+   }
+}
+
+
+export const getSingleOld = async(req,res)=>{
+   const {id} = req.params;
+
+   try {
+      if(!mongoose.isValidObjectId(id)){
+         return res.status(400).json({message:"Put valid objectId"})
+      }
+
+      const user = await User.findById(id);
+
+      if(!user) return res.status(404).json({message:"User not found!"});
+
+      res.status(200).json(user);
+   } catch (error) {
+      console.log("ErrorInSingleOldController ",error.message);
+      res.status(500).json({message:"Internal Server Error"})
+   }
+}
+
+
+export const followUser = async(req,res)=>{
+   const {id} = req.params;
+    const {_id:userId} = req.user;
+
+    try {
+      if(!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(userId)){
+         return res.status(400).json({message:"Put valid id"});
+      }
+
+
+      const currentUser = await User.findById(_id);
+       const userToFollow = await User.findById(userId);
+
+       if(!currentUser || !userToFollow){
+         return res.status(404).json({message:"Users not found"});
+       }
+
+       const toFollowParameters = userToFollow.oldParameters;
+
+       if(!toFollowParameters.followers.includes(currentUser._id)){
+         //Follow
+         await toFollowParameters.push(currentUser._id);
+         await toFollowParameters.save();
+
+         if(currentUser.typeUser === 'student'){
+           await currentUser.studentParameters.follow.push(userToFollow._id);
+           await currentUser.save();
+
+           res.status(200).json({message:"Follow"});
+         }else if(currentUser.typeUser === 'old student'){
+            await currentUser.oldParameters.follow.push(userToFollow._id);
+            await currentUser.save();
+
+            res.status(200).json({message:"Follow"});
+         }
+         
+      }else{
+         //Unfollow
+         await toFollowParameters.pull(currentUser._id);
+         await toFollowParameters.save();
+
+         if(currentUser.typeUser === 'student'){
+           await currentUser.studentParameters.follow.push(userToFollow._id);
+           await currentUser.save();
+
+           res.status(200).json({message:"Follow"});
+         }else if(currentUser.typeUser === 'old student'){
+            await currentUser.oldParameters.follow.push(userToFollow._id);
+            await currentUser.save();
+
+            res.status(200).json({message:"Follow"});
+         }
+       }
+
+      
+    } catch (error) {
+      console.log("ErrorInFollowController ",error.message);
+      res.status(500).json({message:"Internal Server Error"})
+    }
+}
 
 
 

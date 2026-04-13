@@ -12,9 +12,17 @@ const notificationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref:"User"
   },
+  title:{
+   type:String,
+   default:''
+  },
+  text:{
+    type:String,
+    default:''
+  },
   typeNotification:{
     type:String,
-    enum:['friend request',"forum","classRoom","message","like"]
+    enum:['friend request',"forum","classRoom","message","like","post"]
   },
   read:{
     type:Boolean,

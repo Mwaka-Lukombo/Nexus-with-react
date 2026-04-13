@@ -26,7 +26,6 @@ export const CreateAlumin = () => {
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
-   let [currentPage,setCurrentPage] = useState(0);
 
   const maxChars = 500;
 
@@ -44,7 +43,7 @@ export const CreateAlumin = () => {
 
   useEffect(()=>{
     getMyNotices(1);
-  },[getMyNotices,currentPage])
+  },[getMyNotices])
 
   const resetForm = ()=>{
     setTitle("");
@@ -77,16 +76,10 @@ export const CreateAlumin = () => {
   }
 
 
-  
- function nextPage() {
-  const totalPages = myNotices?.totalPages || 1;
-  setCurrentPage((prev) => (prev + 1) % totalPages);
-}
 
-function previusPage() {
-  const totalPages = myNotices?.totalPages || 1;
-  setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
-}
+
+  
+
 
  
   return (
@@ -244,18 +237,26 @@ function previusPage() {
               </div>
             ))}
 
-            {myNotices?.totalPages > 1 && (
+            {/* {pagination} */}
             
-                <div className='col-span-2'>
-               <div className='max-w-[500px] mx-auto'>
-                 <div className="join grid grid-cols-2">
-                  <button onClick={previusPage} className="join-item btn btn-outline">Previous page</button>
-                  <button  onClick={nextPage} className={`join-item btn btn-outline`}>Next</button>
-               </div>
-               </div>
+            <div className='col-span-2 flex items-center justify-center'>
+              <div className="join">
+                
+                {[...Array(myNotices?.totalPages)].map((_,index)=> {
+                  const currentPage = Number(index+1)
+                  return(
+                    <input 
+                    className="join-item btn btn-square" 
+                    type="radio" 
+                    name="options" 
+                    aria-label={currentPage} 
+                    onClick={()=> getMyNotices(currentPage)}
+                    checked={myNotices?.currentPage === currentPage || currentPage == 1}
+                    />
+                  )
+                })}
+              </div>
             </div>
-            )}
-            
           </div>
         </div>
         

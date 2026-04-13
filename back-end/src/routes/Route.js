@@ -5,7 +5,8 @@ import campusRoute from './campus.route.js';
 import messageRoute from './message.route.js';
 import forumRoute from './forum.route.js';
 import aluminRoute from './alumin.route.js';
-import notificationRoute from './notification.route.js'
+import notificationRoute from './notification.route.js';
+import adminRoute from './admin.route.js';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use('/api/campus',campusRoute);
 router.use('/api/message',messageRoute);
 router.use('/api/forum',forumRoute);
 router.use('/api/notification',notificationRoute);
+router.use('/api/admin',adminRoute);
 
 
 

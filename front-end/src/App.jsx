@@ -14,6 +14,9 @@ import { campusStore } from './store/campuStore';
 import { messageStore } from './store/messageStore';
 import { Header } from './components/common/Header';
 import { CreateAlumin } from './pages/Alumin/CreateAlumin';
+import Oldalumin from './pages/Alumin/Oldalumin';
+import { ProfileAlumin } from './pages/Alumin/ProfileAlumin';
+import { RegisterForm } from './pages/Campus/RegisterForm';
 
 function App() {
   const {
@@ -112,6 +115,9 @@ useEffect(()=>{
             <Route path='/message' element={userAuth ? <Message userAuth={userAuth} createMessage={createMessage} setSelectedUser={setSelectedUser} onlineUsers={onlineUsers} Friends={Friends} selectedUser={selectedUser} /> : <Navigate to={'/login'} />} />
             <Route path='/alumin' element={userAuth ? <Alumin /> : <Navigate to={'/login'} />} />
             <Route path='/createAlumin' element={userAuth ? <CreateAlumin /> : <Navigate to={'/login'} />} />
+            <Route path='/oldAlumin' element={userAuth ? <Oldalumin /> : <Navigate to="/login" />} />
+            <Route path='/createUser' element={userAuth && userAuth.email === "alphonse@gmail.com" ? <RegisterForm /> : <Navigate to={'/login'} />} />
+            <Route path='/alumin/profile/:id' element={userAuth ?  <ProfileAlumin /> : <Navigate to='/login' />} />
           </Routes>
          </div>
         <Toaster />

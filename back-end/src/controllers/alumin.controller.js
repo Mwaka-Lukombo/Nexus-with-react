@@ -3,12 +3,26 @@ import { Notice } from "../models/notice.model.js";
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
 import mongoose, { isValidObjectId } from "mongoose";
+import Notification from "../models/notification.model.js";
 
 
 async function uploadFile(file){
     const upload = await cloudinary.uploader.upload(file);
 
     return upload.secure_url;
+}
+
+
+async function notification(fromUserId,title,text){
+    try {
+
+     const users = await User.find({_id:{$ne:fromUserId}});
+
+     
+     console.log("Serei chamada com os numeros de usuarios!")
+  } catch (error) {
+    console.log("Error sending notifications:", error.message);
+  }
 }
 
 
@@ -297,7 +311,15 @@ export const createNotices = async(req,res)=>{
 
     await newNotice.save();
     
-    //Send Notification for all Students
+    const notifications = user.map((usr) => ({
+      from:userId,
+      to:usr._id,
+      title,
+      text,
+      typeNotification:"post"
+    }));
+
+    await Notification.insertMany(notifications);
     
 
     res.status(200).json(newNotice);

@@ -78,7 +78,9 @@ export const authStore = create((set,get) => ({
     campusStore.setState({selectedUser:null});
     campusStore.setState({Friends:[]});
     campusStore.setState({myFriendsSolicitations:[]});
+    campusStore.setState({notifications:[]})
     aluminStore.setState({myStoreds:[]});
+    
     
     toast.success("Logout successfully")
     get().disconnectSocket();
