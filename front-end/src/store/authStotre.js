@@ -88,10 +88,11 @@ export const authStore = create((set,get) => ({
      toast.error(error.response?.data?.message);
    }
  },
- updatePorfile:async(data)=>{
+ updatePorfile:async({profileImage, year,course})=>{
+  
   set({isUpdateding:true});
   try {
-    const res = await axiosInstance.post(`/auth/profile`,data);
+    const res = await axiosInstance.post(`/auth/profile`,{profileImage,year,course});
     set({userAuth:res.data});
     toast.success("Profile updated successfully!");
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Download } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { campusStore } from "../../store/campuStore";
 import { AlumniProfileSkeleton } from "../../components/skeletons/AlumniProfileSkeleton";
 
@@ -76,10 +76,11 @@ export const ProfileAlumin = ({ student }) => {
               {parameters?.followers?.length} seguidores
             </p>
 
+            {/* todo function to getThe  */}
             <div className="flex gap-3 mt-2">
-              <a href={parameters?.social1} target="_blank" className="text-sm text-blue-600 hover:underline">LinkedIn</a>
-              <a href={parameters?.social2} target="_blank" className="text-sm text-gray-800 hover:underline">GitHub</a>
-              <a href={parameters?.social3} target="_blank" className="text-sm text-sky-500 hover:underline">Outro</a>
+              <Link to={`${parameters?.redes[0]}`} target="_blank" className="text-sm text-blue-600 hover:underline">LinkedIn</Link>
+              <Link to={`${parameters?.redes[1]}`} target="_blank" className="text-sm text-gray-800 hover:underline">GitHub</Link>
+              <Link to={`${parameters?.redes[2]}`} target="_blank" className="text-sm text-sky-500 hover:underline">Outro</Link>
             </div>
           </div>
 
@@ -93,7 +94,7 @@ export const ProfileAlumin = ({ student }) => {
         </div>
 
         {/* ABOUT */}
-        <div className="mt-8 bg-white p-6 rounded-2xl shadow">
+        <div className="mt-8 border border-[#ccc] p-6 rounded-2xl shadow">
           <h2 className="text-lg font-semibold text-[#721011] mb-2">Sobre</h2>
           <p className="text-gray-600 leading-relaxed">
             {parameters?.about}
@@ -101,17 +102,17 @@ export const ProfileAlumin = ({ student }) => {
         </div>
 
         {/* EXPERIENCE */}
-        <div className="mt-6 bg-white p-6 rounded-2xl shadow">
+        <div className="mt-6 border border-[#ccc] p-6 rounded-2xl shadow">
           <h2 className="text-lg font-semibold text-[#721011] mb-4">Experiência</h2>
 
           <div className="flex flex-col gap-4">
-            {/* {data.experience.map((exp, index) => (
+            {parameters?.empresas?.map((name, index) => (
               <div key={index} className="border-l-2 border-[#721011] pl-4">
-                <h3 className="font-semibold">{exp.role}</h3>
-                <p className="text-sm text-gray-600">{exp.company}</p>
-                <span className="text-xs text-gray-400">{exp.period}</span>
+                <h3 className="font-semibold">{name[0] ?? ""}</h3>
+                <p className="text-sm text-gray-600">{name[1] ?? ""}</p>
+                <span className="text-xs text-gray-400">{name[2] ?? ""}</span>
               </div>
-            ))} */}
+            ))}
 
             <p>{parameters?.experience}</p>
           </div>
@@ -119,46 +120,40 @@ export const ProfileAlumin = ({ student }) => {
 
         {/* ACADEMIC LIFE */}
         {/* To Do */}
-        <div className="mt-6 bg-white p-6 rounded-2xl shadow">
+        <div className="mt-6  border border-[#ccc] p-6 rounded-2xl shadow">
           <h2 className="text-lg font-semibold text-[#721011] mb-4">Vida Académica</h2>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Ensino Primário</p>
-              <h4 className="font-medium">{data.academics.primary}</h4>
+              <h4 className="font-medium">{parameters?.school[0].primario}</h4>
             </div>
 
             <div>
               <p className="text-sm text-gray-500">Ensino Secundário</p>
-              <h4 className="font-medium">{data.academics.secondary}</h4>
+              <h4 className="font-medium">{parameters?.school[0].secundario}</h4>
             </div>
 
             <div>
               <p className="text-sm text-gray-500">Ensino Superior</p>
-              <h4 className="font-medium">{data.academics.higher}</h4>
+              <h4 className="font-medium">{parameters?.school[0].superior}</h4>
             </div>
 
-            {data.academics.masters && (
-              <div>
-                <p className="text-sm text-gray-500">Mestrado</p>
-                <h4 className="font-medium">{data.academics.masters}</h4>
-              </div>
-            )}
+            
           </div>
         </div>
 
         {/* CAUSES */}
-        <div className="mt-6 bg-white p-6 rounded-2xl shadow">
+        <div className="mt-6 shadow border border-[#ccc] p-6 rounded-2xl ">
           <h2 className="text-lg font-semibold text-[#721011] mb-2">Causas</h2>
 
           <div className="flex flex-wrap gap-2">
             
-              <span
-                
-                className="px-3 py-1 bg-[#721011]/10 text-[#721011] rounded-full text-sm"
-              >
-                {parameters?.causes}
-              </span>
+            {/* Aqui */}
+            {parameters?.causes[0].map((value)=> (
+              <span className="px-3 py-1 bg-[#721011]/10 text-[#721011] rounded-full text-sm">{value}</span>
+            ) )}
+           
           </div>
         </div>
 

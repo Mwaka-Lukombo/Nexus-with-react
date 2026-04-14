@@ -17,6 +17,7 @@ import { CreateAlumin } from './pages/Alumin/CreateAlumin';
 import Oldalumin from './pages/Alumin/Oldalumin';
 import { ProfileAlumin } from './pages/Alumin/ProfileAlumin';
 import { RegisterForm } from './pages/Campus/RegisterForm';
+import { ProfilePage } from './pages/Profile/ProfilePage';
 
 function App() {
   const {
@@ -117,6 +118,7 @@ useEffect(()=>{
             <Route path='/createAlumin' element={userAuth ? <CreateAlumin /> : <Navigate to={'/login'} />} />
             <Route path='/oldAlumin' element={userAuth ? <Oldalumin /> : <Navigate to="/login" />} />
             <Route path='/createUser' element={userAuth && userAuth.email === "alphonse@gmail.com" ? <RegisterForm /> : <Navigate to={'/login'} />} />
+            <Route path='/profile' element={userAuth ? <ProfilePage /> : <Navigate to='/login' />} />
             <Route path='/alumin/profile/:id' element={userAuth ?  <ProfileAlumin /> : <Navigate to='/login' />} />
           </Routes>
          </div>

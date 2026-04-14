@@ -115,7 +115,8 @@ export const me = async(req,res)=>{
 
 export const profile = async (req,res)=>{
     const {course,year,profileImage} = req.body;
-      const {_id} = req.user;
+      const {_id,typeUser} = req.user;
+
 
      try {
         
@@ -123,7 +124,7 @@ export const profile = async (req,res)=>{
             return res.status(400).json({message:"Put valid objectId"});
         }
 
-        if(!year){
+        if(typeUser === 'student' && !year){
             return res.status(400).json({message:"Put the year"})
         }
 
@@ -141,9 +142,10 @@ export const profile = async (req,res)=>{
          if (profileImage && profileImage !== user.profileImg) {
            const uploaded = await cloudinary.uploader.upload(profileImage);
            user.profileImg = uploaded.secure_url;
+           await user.save();
         }
 
-        await user.save();
+        
 
        res.status(200).json(user);
 

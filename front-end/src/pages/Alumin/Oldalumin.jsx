@@ -74,7 +74,7 @@ export default function Oldalumin() {
     }
     updateOldProfile(dataProfile);
     resetForm();
-    console.log(dataProfile)
+    
   }
 
   //Oldparameters
@@ -131,7 +131,7 @@ export default function Oldalumin() {
                 <input
                   type="text"
                   name="companies"
-                  value={empresas || user?.empresas || ""}
+                  value={empresas || user?.empresas.join(',') || ""}
                   onChange={(e)=> setEmpresa(e.target.value)}
                   placeholder="Ex: Google, Microsoft..."
                   className="p-3 border rounded-xl focus:ring-2 focus:ring-[#721011] outline-none"
@@ -193,7 +193,7 @@ export default function Oldalumin() {
               <input
                 type="text"
                 name="social1"
-                value={social1 || user?.social1 || ""}
+                value={social1 || user?.redes[0][0] || ""}
                 onChange={(e) => setSocial1(e.target.value)}
                 placeholder="LinkedIn"
                 className="p-3 border rounded-xl focus:ring-2 focus:ring-[#721011] outline-none"
@@ -202,7 +202,7 @@ export default function Oldalumin() {
               <input
                 type="text"
                 name="social2"
-                value={social2 || user?.social2 || ""}
+                value={social2 || user?.redes[0][1] || ""}
                 onChange={(e) => setSocial2(e.target.value)}
                 placeholder="GitHub"
                 className="p-3 border rounded-xl focus:ring-2 focus:ring-[#721011] outline-none"
@@ -211,7 +211,7 @@ export default function Oldalumin() {
               <input
                 type="text"
                 name="social3"
-                value={social3 || user?.social3 || ""}
+                value={social3 || user?.redes[0][2] || ""}
                 onChange={(e)=> setSocial3(e.target.value)}
                 placeholder="Outra rede"
                 className="p-3 border rounded-xl focus:ring-2 focus:ring-[#721011] outline-none"
@@ -243,7 +243,7 @@ export default function Oldalumin() {
                 className="w-full input input-bordered text-sm" 
                 placeholder="Ensino Primario"
                 onChange={(e) => setPrimario(e.target.value)}
-                value={primario || ""}
+                value={primario || user.school[0].primario || ""}
                 />
               </div>
 
@@ -256,7 +256,7 @@ export default function Oldalumin() {
                 className="w-full input input-bordered text-sm" 
                 placeholder="Ensino Secundario"
                 onChange={(e) => setSecundario(e.target.value)}
-                value={secundario || ""}
+                value={secundario || user.school[0].secundario || ""}
                 />
               </div>
 
@@ -269,13 +269,13 @@ export default function Oldalumin() {
                 className="w-full input input-bordered text-sm" 
                 placeholder="Ensino Superior"
                 onChange={(e) => setSuperior(e.target.value)}
-                value={superior || ""}
+                value={superior || user.school[0].superior || ""}
                 />
               </div>
 
               <div className="my-4 flex gap-3">
                 <button onClick={()=> setStep(2)} className="btn w-[50%]">Voltar</button>
-                <button className="btn w-[50%] bg-secundary-color hover:bg-hover text-white">Publicar</button>
+                <button disabled={isUpdateProfileOld} className="btn w-[50%] bg-secundary-color hover:bg-hover text-white">{!isUpdateProfileOld ? "Publicar" : <div className="flex items-center justify-center"><Loader className="size-5 animate-spin" /></div>}</button>
               </div>
 
                 

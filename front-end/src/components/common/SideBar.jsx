@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import {
   Hand,
@@ -209,7 +209,7 @@ export const SideBar = ({
       </div>
 
       {/* FOOTER */}
-      <div className="border-t p-3 flex items-center gap-3">
+      <Link to={'/profile'} className="border-t p-3 flex items-center gap-3">
         <img
           src={userAuth?.profileImg || "/avatar.png"}
           className={`rounded-full ${
@@ -226,7 +226,7 @@ export const SideBar = ({
         <button onClick={handleLogout}>
           <LogOut />
         </button>
-      </div>
+      </Link>
     </aside>
   );
 };

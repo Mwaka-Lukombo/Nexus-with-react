@@ -21,7 +21,7 @@ export const campusStore = create((set,get) => ({
     isUpdateProfileOld:false,
     isLoading:false,
     isMyFriend:false,
-    getAllStudents:async(page)=>{
+    getAllStudents:async(page = 1)=>{
         set({isLoading:true});
         try {
             const res = await axiosInstance.get(`/campus?page=${page}&&limit=8`);

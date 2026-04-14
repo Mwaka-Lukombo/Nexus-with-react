@@ -320,15 +320,11 @@ export const oldProfile = async(req,res)=>{
 
      toEdit.bannerProfile = banner;
      toEdit.experience = experience;
-     toEdit.empresas.push(empresas);
+     toEdit.empresas.push(empresas.trim().split(','));
      toEdit.about = about;
-     toEdit.causes = causes;
-     toEdit.social1 = social1;
-     toEdit.social2 = social2;
-     toEdit.social3 = social3;
-     toEdit.secundario = secundario;
-     toEdit.primario = primario;
-     toEdit.superior = superior;
+     toEdit.causes.push(causes.trim().split(','));
+     toEdit.redes.push([social1,social2,social3]);
+     toEdit.school.push({primario,secundario,superior});
 
       await user.save();
 

@@ -80,7 +80,7 @@ const filteredUsers = students?.users?.filter(
 );
   
 
-
+console.log(students)
 
 
 
@@ -178,6 +178,23 @@ const filteredUsers = students?.users?.filter(
           </div>
 
             ))}
+            
+            <div className='col-span-4 flex gap-2 items-center justify-center'>
+                {[...Array(students?.totalPages)].map((_,index)=> {
+                  const currentPage = index + 1;
+
+                  return (
+                    <input 
+                   className="join-item btn btn-square" 
+                   type="radio"
+                   name="options" 
+                   aria-label={currentPage}
+                   checked={students?.currentPage === currentPage || currentPage === 1} 
+                   onClick={()=> getAllStudents(currentPage)}
+                  />
+                  )
+                })}
+            </div>
             </>  
           )}
 
