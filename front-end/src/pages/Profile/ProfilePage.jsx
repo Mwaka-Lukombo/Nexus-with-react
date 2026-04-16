@@ -3,17 +3,52 @@ import {
   useEffect
 } from 'react'
 import { authStore } from '../../store/authStotre';
-import { Camera, Heart, MessageCircle, User } from 'lucide-react';
+import { 
+  Camera, 
+  Heart, 
+  LucideBookmark, 
+  MessageCircle, 
+  User, 
+  Send
+} from 'lucide-react';
+
+
+import { campusStore } from '../../store/campuStore';
+import { aluminStore } from '../../store/aluminStore';
+import { timeAgo } from '../../utils/formateTime';
+import { MyPlayer } from '../../components/lib/MyPlayer';
 
 export const ProfilePage = () => {
   const [page, setPage] = useState("profile");
    const [image, setImage] = useState(null);
+    const [comment,setComment] = useState("");
 
   const {
     userAuth,
     updatePorfile,
     isUpdateding
   } = authStore();
+
+
+  const {
+    getNotices,
+    notices,
+    like,
+    comments,
+    getComments,
+    stored,
+    createComment,
+    myStoreds,
+    getMyStoreds
+  } = aluminStore();
+
+  useEffect(()=>{
+    getNotices();
+  },[getNotices])
+
+  useEffect(()=>{
+    getMyStoreds();
+  },[getMyStoreds])
 
   const handleSubmit = (e)=>{
     e.preventDefault();
@@ -35,7 +70,17 @@ export const ProfilePage = () => {
 
 
   }
+
+  const handleComment = (e)=>{
+     e.preventDefault();
+     createComment({comment},id)
+
+     
+     setComment("");
+  }
   
+  const myStored = notices.filter(prev => userAuth?.studentParameters?.noticeStored?.includes(prev?._id));
+  console.log(myStored)
   
   return (
     <div className='p-2'>
@@ -58,7 +103,7 @@ export const ProfilePage = () => {
               <form onSubmit={handleSubmit} className='flex items-center justify-center pt-8 '>
                 <div className='relative w-[90px] h-[90px]  flex items-center justify-center rounded-full'>
                   <img src={userAuth.profileImg || image || "/user.png"} 
-                  className={`${userAuth?.profileImg && "w-full h-full"} w-[50px] h-[50px] bg-contain bg-center bg-no-repeat`}
+                  className={`${userAuth?.profileImg && "w-full h-full"} w-[50px] h-[50px] bg-contain bg-center bg-no-repeat rounded-full ring-2`}
                   />
 
                   <label disabled={isUpdateding} className={`${isUpdateding && "bg-black/80 animate-pulse"} absolute bottom-0 right-0 w-[30px] h-[30px] bg-secundary-color text-white flex items-center justify-center rounded-full cursor-pointer`}>
@@ -161,40 +206,121 @@ export const ProfilePage = () => {
         )}
 
         {page === 'storedPage' && (
-          <div className='my-4 w-[100%] md:w-[50%] h-[700px] border border-[#ccc] shadow-xl rounded-xl mx-auto'>
-                          <div className='p-2 flex items-center  gap-3'>
-                             <div className='flex items-center justify-center w-[50px] h-[50px] rounded-full border border-[#ccc]'>
-                                <User />
+          <>
+          {myStored?.length === 0 && <div className='flex items-center justify-center'>You dont have notice stored</div>}
+           {Array.isArray(myStored) && myStored?.map((post)=> (
+             <div className='my-4  w-[100%] md:w-[50%] h-[1000px]  rounded-xl mx-auto'>
+                <div className='p-2 flex items-center  gap-3 h-[7%]'>
+                   <div className='flex items-center justify-center w-[50px] h-[50px] rounded-full border border-[#ccc]'>
+                      {/* profile */}
+                      {post.userId.profileImg && (
+                        <img src={post.userId.profileImg || "/avatar.png"} 
+                        className='w-full h-full rounded-full'
+                        />
+                      )}
+                   </div>
+
+                   <div>
+                      <h3 className='text-sm font-normal'>{post.userId.fullname}</h3>
+                      <p className='text-xs font-bold'>{post.userId.email}</p>
+                   </div>
+
+                   <div>
+                     <h3 className='text-sm text-black font-bold'>{timeAgo(post.createdAt)}</h3>
+                     <span className='text-transparent'>a</span>
+                   </div>
+                </div>
+
+                <div className={`w-full h-[80%] ${post.img && "border border-[#ccc]"}`}>
+                  {post.img && (
+                    <img src={post.img}  
+                  className='w-full h-full bg-cover bg-center bg-no-repeat'
+                  />
+                  )}
+                  {post.video && (
+                    <MyPlayer src={post.video}  />
+                  )}
+                </div>
+
+                <div className='w-full h-[5%] flex items-center justify-between gap-3 px-3'>
+
+                  {/* Comment modal */}
+                  <dialog id={`modal_${post._id}`} className="modal">
+                    <div className="modal-box w-[500px] p-0">
+                      
+                      {/* Aqui 3 */}
+                      <div className='w-full h-[300px] border-b  border-[#ccc] overflow-y-auto'>
+
+                    
+                        
+                         {Array.isArray(comments) && comments.map((comment) => (
+                          <div className='p-2 flex items-center gap-3 w-[80%] relative'>
+                           <div className='avatar border border-[#ccc] rounded-full'>
+                             <div className='w-10 rounded-full'>
+                                <img src={comment.userId?.profileImg || "/avatar.png"}  
+                                alt={post.title}
+                                />
                              </div>
-          
-                             <div>
-                                <h3 className='text-sm font-normal'>{userAuth?.fullname}</h3>
-                                <p className='text-xs font-bold'>Old student</p>
-                             </div>
-          
-                             <div>
-                               <h3 className='text-sm text-[#ccc]'>12 min</h3>
-                               <span className='text-transparent'>a</span>
-                             </div>
-                          </div>
-          
-                          <div className='w-full h-[85%]'>
-                            <img src={'sasasasasasasas'}  
-                            className='w-full h-full bg-cover bg-center bg-no-repeat'
-                            />
-                          </div>
-          
-                          <div className='w-full h-[5%] flex items-center gap-3 px-3'>
-                            <div className='flex items-center'>
-                              <Heart />
-                              <span className='px-1'>13</span>
-                            </div>
-                            <div className='flex items-center'>
-                             <MessageCircle />
-                             <span className='px-1'>54</span>
-                            </div>
-                          </div>
-                        </div>
+                           </div>
+
+                           <div>
+                             <h3 className='text-sm font-semibold'>{comment.userId?.fullname}</h3>
+                             <p className='text-xs'>{comment?.comment}</p>
+                           </div>
+
+                            {/* deleteComment */}
+                           {/* <div className='absolute top-2 right-2 w-[40px] h-[40px] flex items-center rounded-full cursor-pointer justify-center transition-all hover:bg-[#ccc]'>
+                             <Trash className='text-red-500' />
+                           </div> */}
+                         </div>
+                         ))}
+                      </div>
+
+                      <form onSubmit={handleComment} method="dialog" className='flex gap-2 p-3'>
+                      
+                          <input type="text" 
+                          className='flex-1 input input-bordered'
+                          placeholder='Comment anything'
+                          onChange={(e)=> setComment(e.target.value)}
+                          value={comment || ""}
+                          />
+
+                        <button className=' btn btn-md bg-secundary-color text-white hover:bg-hover'><Send /></button>
+                      </form>
+                      
+
+                    </div>
+                  </dialog>
+                   
+                  <div className='flex items-center gap-2'>
+                    <div className='flex items-center cursor-pointer'>
+                    <Heart onClick={()=> like(post?._id)} className={`transition ${post.likes?.includes(userAuth?._id) && "text-red-600"} hover:text-red-600`} />
+                    <span className='px-1'>{post.likes?.length}</span>
+                  </div>
+                  <div className='flex items-center cursor-pointer'>
+                   <MessageCircle 
+                   onClick={() => {
+                    document.getElementById(`modal_${post?._id}`).showModal()
+                    getComments(post?._id)
+                    setId(post?._id)
+                   }}
+                   className='hover:text-hover' />
+                   <span className='px-1'>{post.comments?.length}</span>
+                  </div>
+                  </div>
+
+                  <div className='flex items-center justify-center'>
+                    {/* Aqui2 */}
+                    <LucideBookmark onClick={()=> stored(post?._id)} className={`cursor-pointer ${myStoreds.includes(post._id) && "text-green-500"} hover:text-green-300`} />
+                  </div>
+                </div>
+
+                <div className='w-full h-[7%]'>
+                  <p >{post.text} <span className='text-xs underline text-gray-400 cursor-pointer'>Read more</span> </p>
+                </div>
+              </div>
+           ))}
+          </>
         )}
       </div>    
     </div>

@@ -2,6 +2,7 @@ import {create} from 'zustand';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
 import { messageStore } from './messageStore';
+import { authStore } from './authStotre';
 
 
 
@@ -152,6 +153,15 @@ setSelectedUser:async(data)=>{
 setTheme:async(theme)=>{
    set({theme:theme})
    localStorage.setItem("data-theme",theme)
+},
+followUser:async(id)=>{
+ try {
+    const res = await axiosInstance.patch(`/campus/follow/${id}`);
+
+    authStore.getState().check();
+ } catch (error) {
+    toast.error(error.response?.data?.message);
+ }
 },
 //Old students
 getOldStudens:async(req,res)=>{

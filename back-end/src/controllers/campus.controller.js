@@ -367,8 +367,8 @@ export const followUser = async(req,res)=>{
       }
 
 
-      const currentUser = await User.findById(_id);
-       const userToFollow = await User.findById(userId);
+      const currentUser = await User.findById(userId);
+       const userToFollow = await User.findById(id);
 
        if(!currentUser || !userToFollow){
          return res.status(404).json({message:"Users not found"});
@@ -378,36 +378,39 @@ export const followUser = async(req,res)=>{
 
        if(!toFollowParameters.followers.includes(currentUser._id)){
          //Follow
-         await toFollowParameters.push(currentUser._id);
-         await toFollowParameters.save();
-
+         
          if(currentUser.typeUser === 'student'){
            await currentUser.studentParameters.follow.push(userToFollow._id);
+           await toFollowParameters.followers.push(currentUser._id);
+           
+           await userToFollow.save();
            await currentUser.save();
 
            res.status(200).json({message:"Follow"});
          }else if(currentUser.typeUser === 'old student'){
             await currentUser.oldParameters.follow.push(userToFollow._id);
+            await toFollowParameters.followers.push(currentUser._id);
             await currentUser.save();
+            await userToFollow.save();
 
             res.status(200).json({message:"Follow"});
          }
          
       }else{
          //Unfollow
-         await toFollowParameters.pull(currentUser._id);
-         await toFollowParameters.save();
+         await toFollowParameters.followers.pull(currentUser._id);
+         await userToFollow.save();
 
          if(currentUser.typeUser === 'student'){
-           await currentUser.studentParameters.follow.push(userToFollow._id);
+           await currentUser.studentParameters.follow.pull(userToFollow._id);
            await currentUser.save();
 
-           res.status(200).json({message:"Follow"});
+           res.status(200).json({message:"unFollow"});
          }else if(currentUser.typeUser === 'old student'){
-            await currentUser.oldParameters.follow.push(userToFollow._id);
+            await currentUser.oldParameters.follow.pull(userToFollow._id);
             await currentUser.save();
 
-            res.status(200).json({message:"Follow"});
+            res.status(200).json({message:"unFollow"});
          }
        }
 

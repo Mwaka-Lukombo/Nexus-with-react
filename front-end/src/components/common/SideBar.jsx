@@ -63,7 +63,7 @@ export const SideBar = ({
 
   return (
     <aside
-      className="fixed top-0 left-0 h-screen shadow-xl flex flex-col border-r border-[#ccc] bg-white"
+      className="fixed top-0 left-0 h-screen shadow-xl flex flex-col border-r border-[#ccc] "
       style={{ width: sidebarWidth }}
     >
       {/* HEADER */}
@@ -129,8 +129,8 @@ export const SideBar = ({
           </div>
         )}
 
-        {/* ================= DOCENTE ================= */}
-        {userAuth?.typeUser === "teacher" && (
+        {/* ================= Turmas ================= */}
+        
           <>
             {!isCollapsed && (
               <button
@@ -145,10 +145,12 @@ export const SideBar = ({
             {openTeacher && (
               <div className="ml-3 space-y-1">
 
-                <NavLink to="/classes" className={navClass}>
+                {userAuth?.typeUser === 'student' && (
+                  <NavLink to="/classes" className={navClass}>
                   <GraduationCap size={16} />
                   {!isCollapsed && <span>Class</span>}
                 </NavLink>
+                )}
                 
                 {userAuth?.typeUser === 'teacher' && (
                   <>
@@ -166,7 +168,7 @@ export const SideBar = ({
               </div>
             )}
           </>
-        )}
+        
 
         {/* ================= FORUM ================= */}
         {!isCollapsed && (

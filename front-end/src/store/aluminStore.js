@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { authStore } from "./authStotre";
 
 
 
@@ -38,6 +39,7 @@ stored:async(id)=>{
     try {
         const res = await axiosInstance.post(`/alumin/noticeStore/${id}`);
     
+        await authStore.getState().check();
         await get().getMyStoreds();
     } catch (error) {
         toast.error(error.response?.data?.message);

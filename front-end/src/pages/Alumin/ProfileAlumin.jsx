@@ -106,9 +106,9 @@ export const ProfileAlumin = ({ student }) => {
           <h2 className="text-lg font-semibold text-[#721011] mb-4">Experiência</h2>
 
           <div className="flex flex-col gap-4">
-            {parameters?.empresas?.map((name, index) => (
+            {parameters?.empresa !== undefined && parameters?.empresas?.map((name, index) => (
               <div key={index} className="border-l-2 border-[#721011] pl-4">
-                <h3 className="font-semibold">{name[0] ?? ""}</h3>
+                <h3 className="font-semibold">{name[0]}</h3>
                 <p className="text-sm text-gray-600">{name[1] ?? ""}</p>
                 <span className="text-xs text-gray-400">{name[2] ?? ""}</span>
               </div>
@@ -126,17 +126,17 @@ export const ProfileAlumin = ({ student }) => {
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <p className="text-sm text-gray-500">Ensino Primário</p>
-              <h4 className="font-medium">{parameters?.school[0].primario}</h4>
+              <h4 className="font-medium">{parameters?.school[0]?.primario ?? "Ainda por atualizar"}</h4>
             </div>
 
             <div>
               <p className="text-sm text-gray-500">Ensino Secundário</p>
-              <h4 className="font-medium">{parameters?.school[0].secundario}</h4>
+              <h4 className="font-medium">{parameters?.school[0]?.secundario ?? "Ainda por atualizar"}</h4>
             </div>
 
             <div>
               <p className="text-sm text-gray-500">Ensino Superior</p>
-              <h4 className="font-medium">{parameters?.school[0].superior}</h4>
+              <h4 className="font-medium">{parameters?.school[0]?.superior ?? "Ainda por atualizar"}</h4>
             </div>
 
             
@@ -150,9 +150,7 @@ export const ProfileAlumin = ({ student }) => {
           <div className="flex flex-wrap gap-2">
             
             {/* Aqui */}
-            {parameters?.causes[0].map((value)=> (
-              <span className="px-3 py-1 bg-[#721011]/10 text-[#721011] rounded-full text-sm">{value}</span>
-            ) )}
+            <span className="px-3 py-1 bg-[#721011]/10 text-[#721011] rounded-full text-sm">{parameters?.causes}</span>
            
           </div>
         </div>
