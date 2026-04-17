@@ -1,4 +1,8 @@
 import React, { useState } from 'react'
+import { classStore } from '../../store/classStore';
+import { 
+  LoaderIcon
+ } from 'react-hot-toast';
 
 export const ClassRoomCreate = () => {
   const [type, setType] = useState("");
@@ -11,6 +15,12 @@ export const ClassRoomCreate = () => {
     year:"",
     description:""
    })
+
+   const {
+   isLoading,
+   classRooms,
+   createClass
+   } = classStore();
 
 
   function readerFile(file,setFunc){
@@ -27,6 +37,7 @@ export const ClassRoomCreate = () => {
     const file = e.target.files[0];
     if(file.type === 'image/jpeg' || file.type === 'image/png'
       || file.type === 'image/jpg' || file.type === 'image/webp'
+      || file.type === 'image/avif'
     ){
       //Banner Uploader
       readerFile(file,setBannerClass);
@@ -39,11 +50,42 @@ export const ClassRoomCreate = () => {
     }
    }
 
+   const resetForm = ()=>{
+     setFormData((prev)=> ({
+      ...prev,
+      nameClass:"",
+      course:"",
+      year:"",
+      description:""
+     }));
+
+     setBannerClass(null);
+     setVideo(null);
+     setFile(bull);
+   }
+
    const handleSumbit = (e)=>{
      e.preventDefault();
 
-     
-     console.log(newClass)
+     const {
+      nameClass,
+      course,
+      year,
+      description
+     } = form;
+
+     const newClass = {
+      nameClass,
+      course,
+      year,
+      description,
+      video,
+      file,
+      bannerClass
+     }
+
+     createClass(newClass);
+     resetForm();
    }
    
   
@@ -131,6 +173,7 @@ export const ClassRoomCreate = () => {
           ...prev,
           description:e.target.value
         }))}
+        value={form.description || ""}
       ></textarea>
     </div>
 
@@ -146,8 +189,8 @@ export const ClassRoomCreate = () => {
 
     {/* Botão */}
     <div className="pt-4">
-      <button className="w-full bg-[#721011] hover:bg-[#8A1A20] text-white font-semibold py-3 rounded-xl transition">
-        Criar Turma
+      <button disabled={isLoading} className="w-full bg-[#721011] hover:bg-[#8A1A20] text-white font-semibold py-3 rounded-xl transition">
+        {!isLoading ? "Criar Turma" : <div className='flex items-center justify-center'><LoaderIcon className='size-5 animate-spin' /></div>}
       </button>
     </div>
     </form>

@@ -9,7 +9,8 @@ import {
   LucideBookmark, 
   MessageCircle, 
   User, 
-  Send
+  Send,
+  Loader
 } from 'lucide-react';
 
 
@@ -22,6 +23,11 @@ export const ProfilePage = () => {
   const [page, setPage] = useState("profile");
    const [image, setImage] = useState(null);
     const [comment,setComment] = useState("");
+     const [formData, setFormData] = useState({
+      course:"",
+      year:"",
+      password:""
+     })
 
   const {
     userAuth,
@@ -50,25 +56,49 @@ export const ProfilePage = () => {
     getMyStoreds();
   },[getMyStoreds])
 
-  const handleSubmit = (e)=>{
-    e.preventDefault();
+  
+
+  const resetForm = ()=>{
+    setFormData((prev) => ({
+      ...prev,
+      course:"",
+      year:"",
+      password:""
+    }))
+    setImage(null);
   }
+
+    const handleSubmit = (e)=>{
+    e.preventDefault();
+
+    const {
+      course,
+      year,
+      password
+    } = formData;
+
+    const updateData = {
+      course,
+      year,
+      password,
+      profileImage:image
+    }
+
+    console.log(updateData)
+    updatePorfile(updateData);
+    resetForm();
+  }
+
 
   const handleImage = (e)=>{
     const file = e.target.files[0];
-
       const reader = new FileReader();
       reader.readAsDataURL(file);
 
       reader.onload = async ()=>{
         const base64Image = reader.result;
         setImage(base64Image);
-        updatePorfile({profileImage:base64Image});
-        setImage("");
       }
-
-
-
   }
 
   const handleComment = (e)=>{
@@ -78,9 +108,10 @@ export const ProfilePage = () => {
      
      setComment("");
   }
+
+
   
   const myStored = notices.filter(prev => userAuth?.studentParameters?.noticeStored?.includes(prev?._id));
-  console.log(myStored)
   
   return (
     <div className='p-2'>
@@ -99,11 +130,14 @@ export const ProfilePage = () => {
       <div className='my-7'>
         {page === 'profile' && (
           <>
-            <div className='max-w-[700px] mx-auto shadow-xl border border-[#ccc] rounded-xl px-2'>
-              <form onSubmit={handleSubmit} className='flex items-center justify-center pt-8 '>
-                <div className='relative w-[90px] h-[90px]  flex items-center justify-center rounded-full'>
+            <div className='max-w-[700px] mx-auto shadow-xl border border-[#ccc] rounded-xl px-2'>                
+              
+              <form onSubmit={handleSubmit} className='p-2'>
+
+                <div className='flex items-center justify-center'>
+                  <div className='relative w-[90px] h-[90px]  flex items-center justify-center rounded-full'>
                   <img src={userAuth.profileImg || image || "/user.png"} 
-                  className={`${userAuth?.profileImg && "w-full h-full"} w-[50px] h-[50px] bg-contain bg-center bg-no-repeat rounded-full ring-2`}
+                  className={`${userAuth?.profileImg && "w-full h-full"} w-[70px] h-[70px] bg-contain bg-center bg-no-repeat rounded-full ring-2`}
                   />
 
                   <label disabled={isUpdateding} className={`${isUpdateding && "bg-black/80 animate-pulse"} absolute bottom-0 right-0 w-[30px] h-[30px] bg-secundary-color text-white flex items-center justify-center rounded-full cursor-pointer`}>
@@ -116,9 +150,7 @@ export const ProfilePage = () => {
                   </label>
                   
                 </div>
-              </form>
-
-              <form>
+                </div>
                  
                  {userAuth?.typeUser === 'student' ? (
                   <>
@@ -130,8 +162,12 @@ export const ProfilePage = () => {
 
                   <input type="text"  
                    placeholder='Engenharia informatica'
-                   value={userAuth?.course || ""}
+                   value={userAuth?.course || "" || formData.course}
                   className='input input-bordered'
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    course: e.target.value
+                  }))}
                   />
                  </div>
 
@@ -142,8 +178,12 @@ export const ProfilePage = () => {
 
                   <input type="text"  
                    placeholder='Engenharia informatica'
-                   value={userAuth?.year || ""}
+                   value={userAuth?.year || "" || formData.year}
                   className='input input-bordered'
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    year:e.target.value
+                  }))}
                   />
                  </div>
 
@@ -157,6 +197,11 @@ export const ProfilePage = () => {
                   <input type="text"  
                    placeholder='*****'
                   className='input input-bordered'
+                  onChange={(e) => setFormData((prev) => ({
+                    ...prev,
+                    password:e.target.value
+                  }))}
+                  value={formData.password || ""}
                   />
                  </div>
                   </>
@@ -199,7 +244,11 @@ export const ProfilePage = () => {
                  </>
                  }
 
-                 <button className='my-5 btn bg-secundary-color text-white hover:bg-hover'>Update</button>
+                 <button disabled={isUpdateding} className='my-5 btn bg-secundary-color text-white hover:bg-hover'>
+                  {!isUpdateding ? "Update" : <div className='flex items-center justify-center'>
+                   <Loader className='size-5 animate-spin' />  
+                  </div>}
+                 </button>
               </form>
             </div>
           </>

@@ -20,6 +20,7 @@ import { RegisterForm } from './pages/Campus/RegisterForm';
 import { ProfilePage } from './pages/Profile/ProfilePage';
 import { ClassRoomCreate } from './pages/ClassRoom/ClassRoomCreate';
 import {MyClassesPages} from './pages/ClassRoom/MyClassesPages';
+import { ClassRoomSingle } from './pages/ClassRoom/ClassRoomSingle';
 
 
 
@@ -126,6 +127,7 @@ useEffect(()=>{
             <Route path='/profile' element={userAuth ? <ProfilePage /> : <Navigate to='/login' />} />
             <Route path='/createClass' element={userAuth ? <ClassRoomCreate /> : <Navigate to={'/login'} />} />
             <Route path='/myClasses' element={userAuth ? <MyClassesPages /> : <Navigate to={'/login'} />} />
+            <Route path='/myClasses/single/:id' element={userAuth ? <ClassRoomSingle /> : <Navigate to={'/login'} />} />
             <Route path='/alumin/profile/:id' element={userAuth ?  <ProfileAlumin /> : <Navigate to='/login' />} />
           </Routes>
          </div>

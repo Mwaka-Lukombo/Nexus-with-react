@@ -114,7 +114,13 @@ export const me = async(req,res)=>{
 
 
 export const profile = async (req,res)=>{
-    const {course,year,profileImage} = req.body;
+    const {
+        course,
+        year,
+        profileImage,
+        password
+
+    } = req.body;
       const {_id,typeUser} = req.user;
 
 
@@ -136,8 +142,15 @@ export const profile = async (req,res)=>{
             return res.status(404).json({message:"User not found!"});
         }
 
+        if(password.length < 6) return res.status(400).json({message:"Your password bust be 6 characters"})
+
+        //cryptingPassword
+        const salt = await bcrypt.genSalt(12);
+         const hash = await bcrypt.hash(password,salt);
+
         user.course = course || user.course;
         user.year = year;
+        user.password = hash;
 
          if (profileImage && profileImage !== user.profileImg) {
            const uploaded = await cloudinary.uploader.upload(profileImage);
