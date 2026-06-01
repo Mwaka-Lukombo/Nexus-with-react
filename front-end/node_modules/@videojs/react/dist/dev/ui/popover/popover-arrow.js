@@ -1,0 +1,15 @@
+"use client";
+import { createContextPart } from "../create-context-part.js";
+import { usePopoverContext } from "./context.js";
+//#region src/ui/popover/popover-arrow.tsx
+/** Decorative arrow pointing from the popup toward the trigger. Hidden from assistive technology. */
+const PopoverArrow = createContextPart({
+	displayName: "PopoverArrow",
+	tag: "div",
+	useContext: usePopoverContext,
+	staticProps: { "aria-hidden": "true" }
+});
+//#endregion
+export { PopoverArrow };
+
+//# sourceMappingURL=popover-arrow.js.map

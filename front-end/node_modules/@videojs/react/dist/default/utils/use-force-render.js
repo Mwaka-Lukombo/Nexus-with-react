@@ -1,0 +1,11 @@
+"use client";
+import { useReducer } from "react";
+//#region src/utils/use-force-render.ts
+function useForceRender() {
+	const [, forceRender] = useReducer((c) => c + 1, 0);
+	return forceRender;
+}
+//#endregion
+export { useForceRender };
+
+//# sourceMappingURL=use-force-render.js.map

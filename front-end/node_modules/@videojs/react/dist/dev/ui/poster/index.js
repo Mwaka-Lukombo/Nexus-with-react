@@ -1,0 +1,2 @@
+import { Poster } from "./poster.js";
+export { Poster };

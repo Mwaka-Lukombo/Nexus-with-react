@@ -1,0 +1,2 @@
+import { CaptionsButton } from "./captions-button.js";
+export { CaptionsButton };
