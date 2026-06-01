@@ -5,11 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node back-end/src/app.js",
-    "build": "npm install && npm install --prefix front-end && npm run build --prefix front-end"
+    "build": "cd front-end && npm install && npm run build",
+    "postinstall": "npm install --prefix front-end"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Mwaka-Lukombo/Nexus-with-react.git"
+  },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
   },
   "dependencies": {
     "@mongodb-js/saslprep": "^1.4.11",
